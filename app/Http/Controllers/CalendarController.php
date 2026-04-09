@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\CalendarService;
 use App\Models\Appointment;
 use App\Models\User;
+use App\Services\CalendarService;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Http\Request;
@@ -15,9 +15,7 @@ use Inertia\Response;
 
 class CalendarController extends Controller
 {
-    public function __construct(private CalendarService $calendarService)
-    {
-    }
+    public function __construct(private CalendarService $calendarService) {}
 
     public function index(Request $request): Response
     {
@@ -41,13 +39,15 @@ class CalendarController extends Controller
         )->map(function ($apt) {
             return [
                 'id' => $apt->id,
-                'title' => "{$apt->patient->name} - {$apt->type->label()}",
+                'title' => $apt->patient->name,
                 'start' => $apt->starts_at->toIso8601String(),
                 'end' => $apt->ends_at->toIso8601String(),
-                'status' => $apt->status,
+                'status' => $apt->status->value,
+                'professional_id' => $apt->professional_id,
                 'professional' => $apt->professional?->name,
                 'patient' => $apt->patient?->name,
-                'type' => $apt->type,
+                'type' => $apt->type->value,
+                'type_label' => $apt->type->label(),
             ];
         });
 

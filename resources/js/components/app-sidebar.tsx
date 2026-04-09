@@ -1,7 +1,6 @@
 import { Link } from '@inertiajs/react';
-import { ActivitySquare, BookOpen, CalendarDays, DollarSign, LayoutGrid, Users, UserSquare2 } from 'lucide-react';
+import { ActivitySquare, CalendarCheck, CalendarDays, ClipboardCheck, DollarSign, FileText, LayoutGrid, Users, UserSquare2 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -12,6 +11,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
@@ -38,6 +38,19 @@ const mainNavItems: NavItem[] = [
         icon: CalendarDays,
     },
     {
+        title: 'Calendário',
+        href: '/calendar',
+        icon: CalendarCheck,
+    },
+    {
+        title: 'Check-in',
+        href: '/checkin',
+        icon: ClipboardCheck,
+    },
+];
+
+const clinicalNavItems: NavItem[] = [
+    {
         title: 'Clínico',
         href: '/clinical/treatment-plans/create',
         icon: ActivitySquare,
@@ -47,13 +60,10 @@ const mainNavItems: NavItem[] = [
         href: '/financial/payments',
         icon: DollarSign,
     },
-];
-
-const footerNavItems: NavItem[] = [
     {
-        title: 'Documentação',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
+        title: 'Documentos',
+        href: '/documents',
+        icon: FileText,
     },
 ];
 
@@ -73,11 +83,12 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={mainNavItems} label="Principal" />
+                <SidebarSeparator />
+                <NavMain items={clinicalNavItems} label="Gestão" />
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

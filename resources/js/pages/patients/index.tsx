@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { Patient } from '@/types';
-import { PlusIcon, SearchIcon } from 'lucide-react';
+import { PlusIcon, SearchIcon, Users, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCallback, useState } from 'react';
 
 type PaginatedPatients = {
@@ -44,18 +44,23 @@ export default function PatientsIndex({ patients, filters }: Props) {
         <>
             <Head title="Pacientes" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 p-6">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 md:p-6">
                 {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-semibold">Pacientes</h1>
-                        <p className="text-sm text-muted-foreground">
-                            {patients.total} paciente{patients.total !== 1 ? 's' : ''} cadastrado{patients.total !== 1 ? 's' : ''}
-                        </p>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
+                            <Users className="size-5 text-primary" />
+                        </div>
+                        <div>
+                            <h1 className="text-xl font-bold tracking-tight md:text-2xl">Pacientes</h1>
+                            <p className="text-sm text-muted-foreground">
+                                {patients.total} paciente{patients.total !== 1 ? 's' : ''} cadastrado{patients.total !== 1 ? 's' : ''}
+                            </p>
+                        </div>
                     </div>
-                    <Button asChild>
+                    <Button asChild size="default" className="shrink-0">
                         <Link href={create.url()}>
-                            <PlusIcon />
+                            <PlusIcon className="size-4" />
                             Novo Paciente
                         </Link>
                     </Button>
@@ -78,72 +83,69 @@ export default function PatientsIndex({ patients, filters }: Props) {
                         </Button>
                     </form>
 
-                    <div className="flex gap-2">
-                        <Button
-                            variant={!filters.status ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => handleStatusFilter(undefined)}
-                        >
-                            Todos
-                        </Button>
-                        <Button
-                            variant={filters.status === 'active' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => handleStatusFilter('active')}
-                        >
-                            Ativos
-                        </Button>
-                        <Button
-                            variant={filters.status === 'inactive' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => handleStatusFilter('inactive')}
-                        >
-                            Inativos
-                        </Button>
+                    <div className="flex gap-1.5">
+                        {[
+                            { label: 'Todos', value: undefined },
+                            { label: 'Ativos', value: 'active' },
+                            { label: 'Inativos', value: 'inactive' },
+                        ].map((opt) => (
+                            <Button
+                                key={opt.label}
+                                variant={filters.status === opt.value ? 'default' : 'ghost'}
+                                size="sm"
+                                onClick={() => handleStatusFilter(opt.value)}
+                                className="rounded-full"
+                            >
+                                {opt.label}
+                            </Button>
+                        ))}
                     </div>
                 </div>
 
                 {/* Table */}
-                <div className="overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                <div className="overflow-hidden rounded-2xl border bg-card shadow-sm">
                     <table className="w-full text-sm">
-                        <thead className="bg-muted/50">
+                        <thead className="border-b bg-muted/40">
                             <tr>
-                                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Nome</th>
-                                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground md:table-cell">Telefone</th>
-                                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground lg:table-cell">E-mail</th>
-                                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
-                                <th className="px-4 py-3" />
+                                <th className="px-5 py-3.5 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Nome</th>
+                                <th className="hidden px-5 py-3.5 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground md:table-cell">Telefone</th>
+                                <th className="hidden px-5 py-3.5 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground lg:table-cell">E-mail</th>
+                                <th className="px-5 py-3.5 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Status</th>
+                                <th className="px-5 py-3.5" />
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-border">
+                        <tbody className="divide-y divide-border/50">
                             {patients.data.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="py-12 text-center text-muted-foreground">
-                                        Nenhum paciente encontrado.
+                                    <td colSpan={5} className="py-16 text-center">
+                                        <Users className="mx-auto mb-2 size-10 text-muted-foreground/30" />
+                                        <p className="text-sm text-muted-foreground">Nenhum paciente encontrado.</p>
                                     </td>
                                 </tr>
                             ) : (
                                 patients.data.map((patient) => (
-                                    <tr key={patient.id} className="hover:bg-muted/30 transition-colors">
-                                        <td className="px-4 py-3">
-                                            <div className="font-medium">{patient.name}</div>
-                                            {patient.cpf && (
-                                                <div className="text-xs text-muted-foreground">{patient.cpf}</div>
-                                            )}
+                                    <tr key={patient.id} className="group transition-colors hover:bg-muted/30">
+                                        <td className="px-5 py-3.5">
+                                            <Link href={`/patients/${patient.id}`} className="block">
+                                                <div className="font-medium group-hover:text-primary">{patient.name}</div>
+                                                {patient.cpf && (
+                                                    <div className="mt-0.5 text-xs text-muted-foreground">{patient.cpf}</div>
+                                                )}
+                                            </Link>
                                         </td>
-                                        <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">
+                                        <td className="hidden px-5 py-3.5 text-muted-foreground md:table-cell">
                                             {patient.phone ?? '—'}
                                         </td>
-                                        <td className="hidden px-4 py-3 text-muted-foreground lg:table-cell">
+                                        <td className="hidden px-5 py-3.5 text-muted-foreground lg:table-cell">
                                             {patient.email ?? '—'}
                                         </td>
-                                        <td className="px-4 py-3">
-                                            <Badge variant={patient.is_active ? 'default' : 'secondary'}>
+                                        <td className="px-5 py-3.5">
+                                            <Badge variant={patient.is_active ? 'default' : 'secondary'} className="rounded-full">
                                                 {patient.is_active ? 'Ativo' : 'Inativo'}
                                             </Badge>
                                         </td>
-                                        <td className="px-4 py-3 text-right">
-                                            <Button variant="ghost" size="sm" asChild>
+                                        <td className="px-5 py-3.5 text-right">
+                                            <Button variant="ghost" size="sm" asChild className="opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <Link href={`/patients/${patient.id}`}>Ver</Link>
                                             </Button>
                                         </td>
@@ -167,6 +169,7 @@ export default function PatientsIndex({ patients, filters }: Props) {
                                 disabled={!patients.prev_page_url}
                                 onClick={() => patients.prev_page_url && router.get(patients.prev_page_url)}
                             >
+                                <ChevronLeft className="size-4" />
                                 Anterior
                             </Button>
                             <Button
@@ -176,6 +179,7 @@ export default function PatientsIndex({ patients, filters }: Props) {
                                 onClick={() => patients.next_page_url && router.get(patients.next_page_url)}
                             >
                                 Próxima
+                                <ChevronRight className="size-4" />
                             </Button>
                         </div>
                     </div>

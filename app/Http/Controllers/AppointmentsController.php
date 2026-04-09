@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\AppointmentStatus;
+use App\Http\Requests\Appointments\MoveAppointmentRequest;
 use App\Http\Requests\Appointments\StoreAppointmentRequest;
 use App\Http\Requests\Appointments\UpdateAppointmentRequest;
 use App\Models\Appointment;
@@ -10,6 +11,7 @@ use App\Models\Patient;
 use App\Models\User;
 use App\Services\AppointmentConflictService;
 use Carbon\CarbonImmutable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -20,8 +22,7 @@ class AppointmentsController extends Controller
 {
     public function __construct(
         private AppointmentConflictService $conflictService,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): Response
     {
@@ -134,6 +135,24 @@ class AppointmentsController extends Controller
             ->with('success', 'Agendamento atualizado com sucesso.');
     }
 
+    public function move(MoveAppointmentRequest $request, Appointment $appointment): JsonResponse
+    {
+        $startsAt = CarbonImmutable::parse((string) $request->validated('starts_at'));
+        $duration = $appointment->starts_at->diffInMinutes($appointment->ends_at);
+        $endsAt = $startsAt->addMinutes($duration);
+
+        if ($this->hasConflicts($appointment->professional_id, $appointment->patient_id, $startsAt, $endsAt, $appointment->id)) {
+            return response()->json(['message' => 'Conflito de horário detectado.'], 422);
+        }
+
+        $appointment->update([
+            'starts_at' => $startsAt,
+            'ends_at' => $endsAt,
+        ]);
+
+        return response()->json(['message' => 'Agendamento movido com sucesso.']);
+    }
+
     public function destroy(Appointment $appointment): RedirectResponse
     {
         Gate::authorize('delete', $appointment);
@@ -148,7 +167,7 @@ class AppointmentsController extends Controller
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */
     private function sanitizePayload(array $data, int $currentUserId, bool $isProfessional): array

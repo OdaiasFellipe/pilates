@@ -7,9 +7,9 @@ use App\Enums\AppointmentType;
 use Database\Factories\AppointmentFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Model;
 
 #[Fillable([
     'patient_id',
@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
     'ends_at',
     'type',
     'status',
+    'checked_in_at',
     'notes',
     'cancellation_reason',
     'reminder_sent_at',
@@ -36,6 +37,7 @@ class Appointment extends Model
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
             'reminder_sent_at' => 'datetime',
+            'checked_in_at' => 'datetime',
             'type' => AppointmentType::class,
             'status' => AppointmentStatus::class,
         ];

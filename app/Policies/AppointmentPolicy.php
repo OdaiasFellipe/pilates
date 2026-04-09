@@ -36,4 +36,9 @@ class AppointmentPolicy
     {
         return $this->view($user, $appointment);
     }
+
+    public function checkIn(User $user, Appointment $appointment): bool
+    {
+        return $this->view($user, $appointment);
+    }
 }

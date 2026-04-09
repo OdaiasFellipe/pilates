@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AppointmentsController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\ClinicalReportsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentsController;
@@ -30,6 +31,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('patients', PatientsController::class);
     Route::resource('professionals', ProfessionalsController::class);
     Route::resource('appointments', AppointmentsController::class);
+    Route::patch('appointments/{appointment}/move', [AppointmentsController::class, 'move'])->name('appointments.move');
 
     Route::prefix('clinical')->name('clinical.')->group(function () {
         Route::resource('evaluations', EvaluationsController::class)->only(['create', 'store', 'show']);
@@ -52,6 +54,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('calendar', [CalendarController::class, 'index'])->name('calendar.index');
     Route::post('calendar/available-slots', [CalendarController::class, 'availableSlots'])->name('calendar.availableSlots');
+
+    Route::get('checkin', [CheckInController::class, 'index'])->name('checkin.index');
+    Route::post('checkin/{appointment}/check-in', [CheckInController::class, 'checkIn'])->name('checkin.checkIn');
+    Route::post('checkin/{appointment}/no-show', [CheckInController::class, 'noShow'])->name('checkin.noShow');
 
     Route::prefix('patients')->name('patients.')->group(function () {
         Route::get('{patient}/documents', [DocumentsController::class, 'index'])->name('documents.index');
