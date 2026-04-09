@@ -1,0 +1,51 @@
+# Comandos Operacionais - Sprint 10 (Notificacoes)
+
+# 1) Preparar ambiente (uma vez)
+cd /var/www/html/pilates
+php artisan migrate --no-interaction
+php artisan config:clear
+php artisan cache:clear
+
+# 2) Rodar app local (desenvolvimento)
+composer run dev
+
+# 3) Rodar fila (processa notificacoes enfileiradas)
+php artisan queue:work --tries=3
+
+# 4) Rodar scheduler continuamente (desenvolvimento)
+php artisan schedule:work
+
+# 4.1) Comandos exatos para deixar queue + scheduler rodando
+# Terminal 1 (queue)
+cd /var/www/html/pilates
+php artisan queue:work --sleep=1 --tries=3 --max-time=3600
+
+# Terminal 2 (scheduler)
+cd /var/www/html/pilates
+php artisan schedule:work
+
+# Terminal 3 (validacao rapida)
+cd /var/www/html/pilates
+php artisan schedule:list
+php artisan notifications:dispatch-reminders --dry-run
+
+# 5) Teste manual do comando de lembretes
+php artisan notifications:dispatch-reminders --dry-run
+php artisan notifications:dispatch-reminders
+
+# 6) Testes automatizados relevantes
+php artisan test --compact tests/Feature/Notifications/DispatchRemindersCommandTest.php tests/Feature/DashboardControllerTest.php
+
+# 7) Build de frontend
+npm run build
+
+# 8) Producao - cron (executar a cada minuto)
+* * * * * cd /var/www/html/pilates && php artisan schedule:run >> /dev/null 2>&1
+
+# 9) Producao - worker da fila (via supervisor/systemd)
+php artisan queue:work --sleep=1 --tries=3 --max-time=3600
+
+# 10) Logs uteis para monitorar
+php artisan pail
+
+tail -f storage/logs/laravel.log

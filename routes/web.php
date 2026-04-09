@@ -1,14 +1,15 @@
 <?php
 
-use App\Http\Controllers\PatientsController;
-use App\Http\Controllers\EvaluationsController;
 use App\Http\Controllers\AppointmentsController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ClinicalReportsController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentsController;
+use App\Http\Controllers\EvaluationsController;
 use App\Http\Controllers\FinancialDashboardController;
 use App\Http\Controllers\PackagesController;
 use App\Http\Controllers\PatientPackagesController;
+use App\Http\Controllers\PatientsController;
 use App\Http\Controllers\PaymentsController;
 use App\Http\Controllers\PerformanceReportsController;
 use App\Http\Controllers\ProfessionalsController;
@@ -24,7 +25,7 @@ Route::inertia('/', 'welcome', [
 ])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('patients', PatientsController::class);
     Route::resource('professionals', ProfessionalsController::class);

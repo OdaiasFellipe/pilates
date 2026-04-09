@@ -29,6 +29,67 @@ export type Patient = {
     is_active: boolean;
     created_at: string;
     updated_at: string;
+    // Eager-loaded relations
+    appointments?: PatientAppointment[];
+    evaluations?: PatientEvaluation[];
+    treatment_plans?: PatientTreatmentPlan[];
+    sessions?: PatientSession[];
+    patient_packages?: PatientPackage[];
+    documents?: PatientDocument[];
+};
+
+export type PatientAppointment = {
+    id: number;
+    starts_at: string;
+    ends_at: string;
+    type: string;
+    status: string;
+    professional?: { id: number; name: string };
+};
+
+export type PatientEvaluation = {
+    id: number;
+    chief_complaint: string | null;
+    diagnosis: string | null;
+    evaluated_at: string;
+    professional?: { id: number; name: string };
+};
+
+export type PatientTreatmentPlan = {
+    id: number;
+    diagnosis: string | null;
+    goals: string | null;
+    created_at: string;
+    professional?: { id: number; name: string };
+};
+
+export type PatientSession = {
+    id: number;
+    attended_at: string;
+    type: string;
+    status: string;
+    professional?: { id: number; name: string };
+};
+
+export type PatientPackage = {
+    id: number;
+    sessions_used: number;
+    sessions_total: number;
+    status: string;
+    starts_at: string;
+    expires_at: string | null;
+    package?: { id: number; name: string };
+    payments?: Array<{ id: number; amount: string; status: string }>;
+};
+
+export type PatientDocument = {
+    id: number;
+    title: string;
+    type: string;
+    file_size: number;
+    original_filename: string;
+    uploaded_at: string;
+    uploadedBy?: { id: number; name: string };
 };
 
 export type PatientFormData = {
@@ -45,3 +106,4 @@ export type PatientFormData = {
     notes: string;
     is_active: boolean;
 };
+

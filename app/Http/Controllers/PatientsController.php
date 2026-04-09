@@ -54,6 +54,29 @@ class PatientsController extends Controller
     {
         Gate::authorize('view', $patient);
 
+        $patient->load([
+            'appointments' => fn ($q) => $q
+                ->with(['professional:id,name'])
+                ->latest('starts_at')
+                ->limit(20),
+            'evaluations' => fn ($q) => $q
+                ->with(['professional:id,name'])
+                ->latest('evaluated_at'),
+            'treatmentPlans' => fn ($q) => $q
+                ->with(['professional:id,name'])
+                ->latest('created_at'),
+            'sessions' => fn ($q) => $q
+                ->with(['professional:id,name'])
+                ->latest('attended_at')
+                ->limit(20),
+            'patientPackages' => fn ($q) => $q
+                ->with(['package:id,name', 'payments:id,patient_package_id,amount,status'])
+                ->latest('created_at'),
+            'documents' => fn ($q) => $q
+                ->with(['uploadedBy:id,name'])
+                ->latest('uploaded_at'),
+        ]);
+
         return Inertia::render('patients/show', [
             'patient' => $patient,
         ]);
